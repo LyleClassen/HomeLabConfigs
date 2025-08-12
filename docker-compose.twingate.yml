@@ -18,9 +18,3 @@ services:
       - NET_ADMIN
     devices:
       - /dev/net/tun:/dev/net/tun
-    networks:
-      - admin-services
-
-networks:
-  admin-services:
-    external: true
