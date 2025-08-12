@@ -18,19 +18,11 @@ services:
       - /srv/docker/crafty-4/servers:/crafty/servers
       - /srv/docker/crafty-4/config:/crafty/app/config
       - /srv/docker/crafty-4/import:/crafty/import
-    networks:
-      - minecraft-net
 
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared-minecraft
+  playit:
+    image: ghcr.io/playit-cloud/playit-agent:0.15
+    container_name: playit-tunnel
     restart: unless-stopped
-    command: tunnel --no-autoupdate run
     environment:
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
-    networks:
-      - minecraft-net
-
-networks:
-  minecraft-net:
-    driver: bridge
+      - SECRET_KEY=${PLAYIT_SECRET}
+    network_mode: host
