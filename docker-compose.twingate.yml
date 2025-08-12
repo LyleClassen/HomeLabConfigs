@@ -3,18 +3,14 @@ version: '3.8'
 services:
   twingate-connector:
     image: twingate/connector:1
-    container_name: twingate-connector
+    container_name: twingate-important-bison
     restart: unless-stopped
+    pull_policy: always
+    network_mode: host
     environment:
+      TWINGATE_NETWORK: ${TWINGATE_NETWORK}
       TWINGATE_ACCESS_TOKEN: ${TWINGATE_ACCESS_TOKEN}
       TWINGATE_REFRESH_TOKEN: ${TWINGATE_REFRESH_TOKEN}
-      TWINGATE_NETWORK: ${TWINGATE_NETWORK}
-      TWINGATE_LOG_LEVEL: ${TWINGATE_LOG_LEVEL:-3}
-      TWINGATE_LOG_ANALYTICS: ${TWINGATE_LOG_ANALYTICS:-v1}
-    sysctls:
-      net.ipv4.ip_forward: 1
-      net.ipv6.conf.all.forwarding: 1
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun:/dev/net/tun
+      TWINGATE_LABEL_HOSTNAME: ${TWINGATE_LABEL_HOSTNAME}
+      TWINGATE_LOG_ANALYTICS: ${TWINGATE_LOG_ANALYTICS:-v2}
+      TWINGATE_LABEL_DEPLOYED_BY: ${TWINGATE_LABEL_DEPLOYED_BY:-docker}
