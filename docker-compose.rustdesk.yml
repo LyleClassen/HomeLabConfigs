@@ -5,18 +5,16 @@ services:
     image: rustdesk/rustdesk-server:latest
     container_name: rustdesk-server
     restart: unless-stopped
+    command: hbbs -r rustdesk-relay:21117
     environment:
-      - RELAY=rustdesk-relay:21116
-      - RUST_LOG=debug
+      - RUST_LOG=info
     ports:
-      - '21115:21115' # TCP (NAT type test)
-      - '21116:21116' # TCP (ID/Rendezvous server)
-      - '21116:21116/udp' # UDP (ID/Rendezvous server)
-      - '21117:21117' # TCP (Relay server)
-      - '21118:21118' # TCP (Web client)
-      - '21119:21119' # TCP (Web client)
+      - '21115:21115' # NAT type test (public)
+      - '21116:21116' # ID/Rendezvous server (public)
+      - '21116:21116/udp' # ID/Rendezvous server UDP (public)
+      - '21118:21118' # Web console (Twingate only)
     volumes:
-      - ./rustdesk/data:/data
+      - /srv/docker/rustdesk/data:/root
     networks:
       - rustdesk-net
 
@@ -25,10 +23,12 @@ services:
     container_name: rustdesk-relay
     restart: unless-stopped
     command: hbbr
+    environment:
+      - RUST_LOG=info
     ports:
-      - '21117:21117' # Relay server
+      - '21117:21117' # Relay server (public)
     volumes:
-      - ./rustdesk/data:/data
+      - /srv/docker/rustdesk/data:/root
     networks:
       - rustdesk-net
 
