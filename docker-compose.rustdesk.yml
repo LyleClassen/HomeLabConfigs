@@ -1,37 +1,23 @@
-version: '3.8'
-
 services:
-  rustdesk-server:
+  hbbs:
+    container_name: hbbs
     image: rustdesk/rustdesk-server:latest
-    container_name: rustdesk-server
-    restart: unless-stopped
-    command: hbbs -r rustdesk-relay:21117
     environment:
-      - RUST_LOG=info
-    ports:
-      - '21115:21115' # NAT type test (public)
-      - '21116:21116' # ID/Rendezvous server (public)
-      - '21116:21116/udp' # ID/Rendezvous server UDP (public)
-      - '21118:21118' # Web console (Twingate only)
+      - ALWAYS_USE_RELAY=Y
+    command: hbbs
     volumes:
-      - /srv/docker/rustdesk/data:/root
-    networks:
-      - rustdesk-net
+      - ./data:/root
+    network_mode: 'host'
 
-  rustdesk-relay:
-    image: rustdesk/rustdesk-server:latest
-    container_name: rustdesk-relay
+    depends_on:
+      - hbbr
     restart: unless-stopped
+
+  hbbr:
+    container_name: hbbr
+    image: rustdesk/rustdesk-server:latest
     command: hbbr
-    environment:
-      - RUST_LOG=info
-    ports:
-      - '21117:21117' # Relay server (public)
     volumes:
-      - /srv/docker/rustdesk/data:/root
-    networks:
-      - rustdesk-net
-
-networks:
-  rustdesk-net:
-    driver: bridge
+      - ./data:/root
+    network_mode: 'host'
+    restart: unless-stopped
