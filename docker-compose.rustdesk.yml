@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  rustdesk-server:
+    image: rustdesk/rustdesk-server:latest
+    container_name: rustdesk-server
+    restart: unless-stopped
+    environment:
+      - RELAY=rustdesk-relay:21116
+      - RUST_LOG=debug
+    ports:
+      - '21115:21115' # TCP (NAT type test)
+      - '21116:21116' # TCP (ID/Rendezvous server)
+      - '21116:21116/udp' # UDP (ID/Rendezvous server)
+      - '21117:21117' # TCP (Relay server)
+      - '21118:21118' # TCP (Web client)
+      - '21119:21119' # TCP (Web client)
+    volumes:
+      - ./rustdesk/data:/data
+    networks:
+      - rustdesk-net
+
+  rustdesk-relay:
+    image: rustdesk/rustdesk-server:latest
+    container_name: rustdesk-relay
+    restart: unless-stopped
+    command: hbbr
+    ports:
+      - '21117:21117' # Relay server
+    volumes:
+      - ./rustdesk/data:/data
+    networks:
+      - rustdesk-net
+
+networks:
+  rustdesk-net:
+    driver: bridge
