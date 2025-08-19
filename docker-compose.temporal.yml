@@ -11,7 +11,7 @@ services:
     volumes:
       - postgresql_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     networks:
       - temporal-network
 
@@ -29,7 +29,7 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     ports:
-      - "9200:9200"
+      - "${ELASTICSEARCH_PORT:-9200}:9200"
     networks:
       - temporal-network
 
@@ -40,7 +40,7 @@ services:
       - elasticsearch
     image: temporalio/auto-setup:1.22.0
     ports:
-      - "7233:7233"
+      - "${TEMPORAL_GRPC_PORT:-7233}:7233"
     environment:
       - DB=postgresql
       - DB_PORT=5432
