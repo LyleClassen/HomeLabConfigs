@@ -51,8 +51,6 @@ services:
       - ENABLE_ES=true
       - ES_SEEDS=elasticsearch
       - ES_VERSION=v7
-    volumes:
-      - ${TEMPORAL_DYNAMICCONFIG_PATH:-/srv/docker/temporal/dynamicconfig}:/etc/temporal/config/dynamicconfig
     networks:
       - temporal-network
 
