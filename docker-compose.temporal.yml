@@ -11,7 +11,7 @@ services:
     volumes:
       - postgresql_data:/var/lib/postgresql/data
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - '${POSTGRES_PORT:-5432}:5432'
     networks:
       - temporal-network
 
@@ -29,7 +29,7 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     ports:
-      - "${ELASTICSEARCH_PORT:-9200}:9200"
+      - '${ELASTICSEARCH_PORT:-9200}:9200'
     networks:
       - temporal-network
 
@@ -40,14 +40,13 @@ services:
       - elasticsearch
     image: temporalio/auto-setup:1.22.0
     ports:
-      - "${TEMPORAL_GRPC_PORT:-7233}:7233"
+      - '${TEMPORAL_GRPC_PORT:-7233}:7233'
     environment:
       - DB=postgresql
       - DB_PORT=5432
       - POSTGRES_USER=temporal
       - POSTGRES_PWD=temporal
       - POSTGRES_SEEDS=postgresql
-      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
       - ENABLE_ES=true
       - ES_SEEDS=elasticsearch
       - ES_VERSION=v7
@@ -72,7 +71,7 @@ services:
       - temporal
     image: temporalio/ui:2.21.3
     ports:
-      - "${TEMPORAL_UI_PORT:-8080}:8080"
+      - '${TEMPORAL_UI_PORT:-8080}:8080'
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CORS_ORIGINS=http://localhost:3000,https://*.smet-server.ddns.net
