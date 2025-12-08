@@ -1,0 +1,27 @@
+FROM ubuntu:22.04
+
+# Basic build tools + GPU compute stacks (OpenCL + Vulkan)
+RUN apt-get update && \
+    apt-get install -y \
+      git build-essential cmake \
+      ocl-icd-opencl-dev clinfo clblast-dev mesa-opencl-icd \
+      libvulkan-dev mesa-vulkan-drivers vulkan-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Clone llama.cpp and build with OpenCL (CLBlast) + Vulkan enabled
+RUN git clone https://github.com/ggerganov/llama.cpp.git . && \
+    cmake -B build -DLLAMA_CLBLAST=ON -DLLAMA_VULKAN=ON && \
+    cmake --build build -j
+
+# Default config (can be overridden by env in compose)
+ENV LLAMA_MODEL=/models/model.gguf \
+    LLAMA_PORT=8080 \
+    LLAMA_THREADS=8 \
+    LLAMA_N_GPU_LAYERS=35
+
+EXPOSE 8080
+
+# Start llama-server with OpenAI-compatible API
+CMD ["bash", "-lc", "./build/bin/llama-server -m ${LLAMA_MODEL} --host 0.0.0.0 --port ${LLAMA_PORT} --n-gpu-layers ${LLAMA_N_GPU_LAYERS} --threads ${LLAMA_THREADS} --api-key dummy"]

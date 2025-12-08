@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  llama-cpp:
+    build:
+      context: .
+      dockerfile: Dockerfile.llama-cpp-opencl-vulkan
+    container_name: llama-cpp
+    restart: unless-stopped
+    # Expose llama-server HTTP API
+    ports:
+      - "8000:8080"
+    volumes:
+      # Host folder where you store GGUF models
+      - /opt/llama/models:/models
+    environment:
+      # Path to your model inside the container
+      # Change this to match the filename you download
+      - LLAMA_MODEL=/models/llama-3.2-1b-instruct-Q4_K_M.gguf
+
+      # Tuning parameters (adjust for your CPU/GPU)
+      - LLAMA_THREADS=8
+      - LLAMA_N_GPU_LAYERS=35
+      - LLAMA_PORT=8080
+
+      # Optional: force Vulkan or OpenCL later if needed
+      # - LLAMA_VULKAN=1
+      # - GGML_OPENCL_PLATFORM=0
+      # - GGML_OPENCL_DEVICE=0
+    devices:
+      # Give container access to GPU via DRM (for OpenCL/Vulkan)
+      - /dev/dri:/dev/dri
+    group_add:
+      - video
+    networks:
+      - llama-net
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui-llama
+    restart: unless-stopped
+    ports:
+      - "3007:8080"
+    volumes:
+      - /opt/openwebui-llama/data:/app/backend/data
+    environment:
+      # Wire Open WebUI to llama.cpp's OpenAI-style API
+      - OPENAI_API_BASE_URL=http://llama-cpp:8080/v1
+      - OPENAI_API_KEY=dummy
+      - WEBUI_NAME=Home Lab Llama
+      - ENABLE_SIGNUP=true
+    depends_on:
+      - llama-cpp
+    networks:
+      - llama-net
+
+networks:
+  llama-net:
+    driver: bridge
+    name: llama-network
