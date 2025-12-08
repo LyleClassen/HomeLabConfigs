@@ -1,19 +1,21 @@
-FROM ubuntu:22.04
+FROM debian:bookworm-slim
 
-# Basic build tools + GPU compute stacks (OpenCL + Vulkan)
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Basic build tools + Vulkan GPU stack + shader compiler
 RUN apt-get update && \
-    apt-get install -y \
-      git build-essential cmake \
-      ocl-icd-opencl-dev clinfo clblast-dev mesa-opencl-icd \
-      libvulkan-dev mesa-vulkan-drivers vulkan-tools \
+    apt-get install -y --no-install-recommends \
+      git build-essential cmake ca-certificates pkg-config \
+      libvulkan-dev mesa-vulkan-drivers vulkan-tools libgomp1 \
+      glslang-tools \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Clone llama.cpp and build with OpenCL (CLBlast) + Vulkan enabled
+# Clone llama.cpp and build with Vulkan enabled
 RUN git clone https://github.com/ggerganov/llama.cpp.git . && \
-    cmake -B build -DLLAMA_CLBLAST=ON -DLLAMA_VULKAN=ON && \
-    cmake --build build -j
+    cmake -B build -DGGML_VULKAN=ON && \
+    cmake --build build -j $(nproc)
 
 # Default config (can be overridden by env in compose)
 ENV LLAMA_MODEL=/models/model.gguf \
