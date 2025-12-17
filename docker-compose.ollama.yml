@@ -15,7 +15,8 @@ services:
       - OLLAMA_HOST=0.0.0.0
       - HSA_OVERRIDE_GFX_VERSION=8.0.3 # Important for RX 570/580
       - ROCR_VISIBLE_DEVICES=0
-      - OLLAMA_NUM_GPU=999 # Use full GPU
+      - OLLAMA_NUM_GPU=999
+      - OLLAMA_VULKAN=1
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri:/dev/dri
