@@ -1,0 +1,120 @@
+services:
+  # ============================================
+  # Paperless-ngx – Document Management System
+  # ============================================
+  paperless:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    container_name: paperless-ngx
+    restart: unless-stopped
+    env_file:
+      - ./envs/paperless.env
+    depends_on:
+      - paperless-postgres
+      - paperless-redis
+      - gotenberg
+      - tika
+    ports:
+      - "8000:8000"
+    volumes:
+      - /opt/paperless/data:/usr/src/paperless/data
+      - /opt/paperless/media:/usr/src/paperless/media
+      - /opt/paperless/export:/usr/src/paperless/export
+      - /opt/paperless/consume:/usr/src/paperless/consume
+    networks:
+      - paperless-net
+      - llama-net
+
+  # ============================================
+  # PostgreSQL – Database for Paperless-ngx
+  # ============================================
+  paperless-postgres:
+    image: postgres:18
+    container_name: paperless-postgres
+    restart: unless-stopped
+    env_file:
+      - ./envs/paperless.env
+    volumes:
+      - /opt/paperless/postgres/data:/var/lib/postgresql
+    networks:
+      - paperless-net
+
+  # ============================================
+  # Redis – Cache / Task Broker for Paperless-ngx
+  # ============================================
+  paperless-redis:
+    image: docker.io/library/redis:8
+    container_name: paperless-redis
+    restart: unless-stopped
+    volumes:
+      - /opt/paperless/redis/data:/data
+    networks:
+      - paperless-net
+
+  # ============================================
+  # Gotenberg – Document Conversion
+  # ============================================
+  gotenberg:
+    image: docker.io/gotenberg/gotenberg:8.25
+    container_name: gotenberg
+    restart: unless-stopped
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+    networks:
+      - paperless-net
+
+  # ============================================
+  # Tika – Document Text Extraction
+  # ============================================
+  tika:
+    image: docker.io/apache/tika:latest
+    container_name: tika
+    restart: unless-stopped
+    networks:
+      - paperless-net
+
+  # ============================================
+  # Paperless-AI – Auto-categorise & tag documents
+  # ============================================
+  paperless-ai:
+    image: clusterzx/paperless-ai:latest
+    container_name: paperless-ai
+    restart: unless-stopped
+    depends_on:
+      - paperless
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./envs/paperless.env
+    volumes:
+      - /opt/paperless/paperless-ai/data:/app/data
+    networks:
+      - paperless-net
+      - llama-net
+
+  # ============================================
+  # Paperless-GPT – LLM-powered title & tag suggestions
+  # ============================================
+  paperless-gpt:
+    image: icereed/paperless-gpt:latest
+    container_name: paperless-gpt
+    restart: unless-stopped
+    depends_on:
+      - paperless
+    ports:
+      - "3002:8080"
+    env_file:
+      - ./envs/paperless.env
+    volumes:
+      - /opt/paperless/paperless-gpt/prompts:/app/prompts
+    networks:
+      - paperless-net
+      - llama-net
+
+networks:
+  paperless-net:
+    driver: bridge
+  llama-net:
+    external: true
+    name: llama-network
