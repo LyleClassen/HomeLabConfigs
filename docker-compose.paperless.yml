@@ -14,7 +14,7 @@ services:
       - gotenberg
       - tika
     ports:
-      - "${PAPERLESS_PORT:-8000}:8000"
+      - "8010:8000"
     volumes:
       - /opt/paperless/data:/usr/src/paperless/data
       - /opt/paperless/media:/usr/src/paperless/media
@@ -84,7 +84,7 @@ services:
     depends_on:
       - paperless
     ports:
-      - "${PAPERLESS_AI_PORT:-3000}:3000"
+      - "3005:3000"
     env_file:
       - ./envs/paperless.env
     volumes:
@@ -103,7 +103,7 @@ services:
     depends_on:
       - paperless
     ports:
-      - "${PAPERLESS_GPT_PORT:-3002}:8080"
+      - "3002:8080"
     env_file:
       - ./envs/paperless.env
     volumes:

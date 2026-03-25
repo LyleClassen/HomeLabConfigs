@@ -8,10 +8,14 @@ services:
     restart: unless-stopped
     ports:
       - "7999:4000"
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
     entrypoint: ["/bin/sh", "-c"]
     command:
     - |
       cat > /tmp/litellm-config.yaml << 'EOF'
+      general_settings:
+        master_key: os.environ/LITELLM_MASTER_KEY
       model_list:
         - model_name: llama-3.2-1b-instruct
           litellm_params:
@@ -189,7 +193,7 @@ services:
     environment:
       # Wire Open WebUI to llama-router for access to all models
       OPENAI_API_BASE_URL: http://litellm:4000/v1
-      OPENAI_API_KEY: dummy
+      OPENAI_API_KEY: ${LITELLM_MASTER_KEY}
       WEBUI_NAME: Home Lab Llama
       ENABLE_SIGNUP: "true"
     depends_on:
