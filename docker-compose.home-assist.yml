@@ -2,10 +2,19 @@ services:
   homeassistant:
     container_name: homeassistant
     image: 'ghcr.io/home-assistant/home-assistant:stable'
+    env_file:
+      - ./envs/homeassistant.env
+    ports:
+      - "${HA_PORT:-8123}:8123"
     volumes:
       - /opt/homeassistant/config:/config
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
     restart: unless-stopped
     privileged: true
-    network_mode: host
+    networks:
+      - homeassistant-net
+
+networks:
+  homeassistant-net:
+    driver: bridge
