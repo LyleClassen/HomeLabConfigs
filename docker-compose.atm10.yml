@@ -7,7 +7,9 @@ services:
     tty: true
     stdin_open: true
     ports:
-      - "127.0.0.1:25565:25565"
+      - '25565:25565'
+      - '19565:19565'
+      - '24454:24454/udp'
     environment:
       TZ: Africa/Johannesburg
       TYPE: AUTO_CURSEFORGE
