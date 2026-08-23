@@ -10,6 +10,7 @@ services:
       - "127.0.0.1:25565:25565"
     environment:
       TZ: Africa/Johannesburg
+      TYPE: AUTO_CURSEFORGE
       CF_API_KEY: ${CF_API_KEY}
       CF_PAGE_URL: https://www.curseforge.com/minecraft/modpacks/all-the-mods-10
       EULA: "TRUE"
@@ -20,7 +21,7 @@ services:
       - /opt/atm10/data:/data
 
   playit:
-    image: ghcr.io/playit-cloud/playit-agent:0.15
+    image: ghcr.io/playit-cloud/playit-agent:latest
     container_name: playit-tunnel
     restart: unless-stopped
     environment:
