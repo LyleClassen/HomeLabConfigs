@@ -1,12 +1,15 @@
 services:
   mc:
+    container_name: atm10_container
     image: itzg/minecraft-server:latest
     pull_policy: daily
+    restart: unless-stopped
     tty: true
     stdin_open: true
     ports:
-      - "25565:25565"
+      - "127.0.0.1:25565:25565"
     environment:
+      TZ: Africa/Johannesburg
       CF_API_KEY: ${CF_API_KEY}
       CF_PAGE_URL: https://www.curseforge.com/minecraft/modpacks/all-the-mods-10
       EULA: "TRUE"
@@ -15,3 +18,11 @@ services:
       USE_AIKAR_FLAGS: 'true'
     volumes:
       - /opt/atm10/data:/data
+
+  playit:
+    image: ghcr.io/playit-cloud/playit-agent:0.15
+    container_name: playit-tunnel
+    restart: unless-stopped
+    environment:
+      - SECRET_KEY=${PLAYIT_SECRET}
+    network_mode: host
