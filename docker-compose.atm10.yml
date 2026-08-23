@@ -10,5 +10,8 @@ services:
       CF_API_KEY: ${CF_API_KEY}
       CF_PAGE_URL: https://www.curseforge.com/minecraft/modpacks/all-the-mods-10
       EULA: "TRUE"
+      MEMORY: '12G'
+      ENABLE_ROLLING_LOGS: 'true'
+      USE_AIKAR_FLAGS: 'true'
     volumes:
       - /opt/atm10/data:/data
